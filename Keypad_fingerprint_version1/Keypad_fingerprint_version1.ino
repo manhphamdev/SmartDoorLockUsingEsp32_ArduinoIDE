@@ -6,10 +6,10 @@
 #include <Adafruit_Fingerprint.h>
 #include <Adafruit_Keypad.h>
 #include <Adafruit_Keypad_Ringbuffer.h>
-#include <TFT_eSPI.h> 
+#include <TFT_eSPI.h>
 #include <Keypad_I2C.h>
 #include <I2CKeyPad.h>
-#include <Keypad.h>        
+#include <Keypad.h>
 #include <Wire.h>
 #include <WiFi.h>
 #include "control_moto.h"
@@ -35,13 +35,13 @@ TFT_eSPI tft = TFT_eSPI();
 //#define IN1 12
 //#define IN2 13
 
-const int  switch_journey = 12;
-const int button_CloseDoor = 14;
-
-int switch_journeyCounter = 0;   // số lần button được nhấn
-int switch_journeyState = 0;         // trạng thái hiện tại của button
-int lastswitch_journeyState = 0;     // trạng thái trước đó của button
-int button_CloseDoorState = 0;
+//const int  switch_journey = 12;
+//const int button_CloseDoor = 14;
+//
+//int switch_journeyCounter = 0;   // số lần button được nhấn
+//int switch_journeyState = 0;         // trạng thái hiện tại của button
+//int lastswitch_journeyState = 0;     // trạng thái trước đó của button
+//int button_CloseDoorState = 0;
 
 unsigned long timerDelay = 0;
 unsigned long timerDelayVoid = 0;
@@ -52,8 +52,8 @@ bool pressNumber;
 char keyRead;
 int numberKeypad;
 
-//byte motor_status = 0; // 0 Stop , 1 Open 2s, 2 Stop 10s, 3 Close 2s, 
-//byte  monitor_status = 0;// 0 Turn off , 1 Turn on Monitor 
+//byte motor_status = 0; // 0 Stop , 1 Open 2s, 2 Stop 10s, 3 Close 2s,
+//byte  monitor_status = 0;// 0 Turn off , 1 Turn on Monitor
 //volatile unsigned long timer_check_motor = 0;
 //volatile unsigned long timer_check_monitor = 0;
 //#define TIME_OPEN_DOOR 10000
@@ -69,17 +69,17 @@ long setNewKeypadPassword;
 long checkChangePassword;
 long setPasswordAdmin =  99999999;
 #define I2C_Addr 0x20                             // I2C Address of PCF8574-board: 0x20 - 0x27
-const byte NbrRows = 4;                           // Number of Rows 
+const byte NbrRows = 4;                           // Number of Rows
 const byte NbrColumns = 4;                        // Number of Columns
 char KeyPadLayout[NbrRows][NbrColumns] = {
-  {'1','2','3','A'}, 
+  {'1','2','3','A'},
   {'4','5','6','B'},
   {'7','8','9','C'},
   {'*','0','#','D'}
 };
 byte PinsLines[NbrRows] = {4,5,6,7};          //  ROWS Pins { 3, 2, 1, 0}
 byte PinsColumns[NbrColumns] = {0,1,2,3};      //  COLUMNS Pins {7, 6, 5, 4}
-Keypad_I2C i2cKeypad( makeKeymap(KeyPadLayout), PinsLines, PinsColumns, NbrRows, NbrColumns, I2C_Addr); 
+Keypad_I2C i2cKeypad( makeKeymap(KeyPadLayout), PinsLines, PinsColumns, NbrRows, NbrColumns, I2C_Addr);
 
 void timeDelay(int timer){
   timerDelay = millis();
@@ -93,11 +93,11 @@ void timeDelay(int timer){
 
 void setup() {
   Serial.begin(9600);
-  pinMode(switch_journey, INPUT_PULLUP);
-  pinMode(button_CloseDoor, INPUT_PULLUP);
+//  pinMode(switch_journey, INPUT_PULLUP);
+//  pinMode(button_CloseDoor, INPUT_PULLUP);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
-  
+
   if(setKeypadPassword == 0){
   Serial.println("setKeypadPassword:");
   Serial.println(setKeypadPassword);
@@ -109,13 +109,13 @@ void setup() {
   Wire.beginTransmission(I2C_Addr);                        // Try to establish connection
   Serial.println(F("Device found on"));
   i2cKeypad.begin();                                     // Start i2cKeypad
-  
+
   tft.init();
   tft.begin();
   tft.fillScreen(TFT_WHITE);
   tft.setCursor(0, 0);
   tft.setRotation(3);
-  tft.setTextColor(TFT_BLACK); 
+  tft.setTextColor(TFT_BLACK);
   tft.setFreeFont(FF12);
   drawScreen();
   homeScreen();
@@ -127,21 +127,21 @@ void setup() {
   else {
     checkX();
     tft.drawString("Didn't find fingerprint sensor",8,180,1);
-    while (1); 
+    while (1);
   }
   Serial.print(F("Capacity: ")); Serial.println(finger.capacity);
   Serial.print(F("Security level: ")); Serial.println(finger.security_level);
   finger.getTemplateCount();
   if (finger.templateCount == 0) {
     checkX();
-    tft.drawString("Sensor doesn't contain any",15,160,1); 
+    tft.drawString("Sensor doesn't contain any",15,160,1);
     tft.drawString("fingerprint data. Please run",8,180,1);
     tft.drawString("the 'enroll' example.",35,200,1);  }
   else {
     Serial.println("Waiting for valid finger...");
-    Serial.print("Sensor contains "); 
-    Serial.print(finger.templateCount); 
-    Serial.println(" templates"); 
+    Serial.print("Sensor contains ");
+    Serial.print(finger.templateCount);
+    Serial.println(" templates");
   }
   motor_status = 0;
   monitor_status = 0;
@@ -155,14 +155,22 @@ uint8_t checkFinger = 1;
 int ackKeypad = 0;
 
 void loop(){
-checkMoto();
-getFingerprintID();
+checkMoto();                                          //Kiem tra trang thai cua moto
+getFingerprintID();                                   //Quet van tay
 Serial.println(setKeypadPassword);
-if(!checkFinger){ 
- checkNum(40,130,245,30,ackKeypad,8,0);
- if(ackKeypad){
+if(!checkFinger){                                     //checkFinger == true: co vantay dang dat vao, checkFinger == false: khong co vantay
+ checkNum(40,130,245,30,ackKeypad,8,0);               //hien thi so nhap vao tren ban phim
+//checkNum{locationX, locationY, WidthRect,HeightRect, ackPress,digitnumber, hideNumber}
+//locationX:    toa do x cua hinh chu nhat hien thi so
+//locationY:    toa do y cua hinh chu nhat hien thi so
+//WidthRect:    chieu rong cua hinh chu nhat
+//HeightRect:   chieu cao cua hinh chu nhat
+//ackPress:     check co nhan vao ban phim hay khong
+//digitnumber:  so chu so hien thi len tren man hinh
+//hideNumber:   0: hien thi so, 1: hien thi ky tu " * ";
+ if(ackKeypad){                                       //ackKeypad:  check xem co nhap vao ban phim hay khong
        if(numberKeypad == setKeypadPassword){
-        Serial.println("success"); 
+        Serial.println("success");
         checkV();
         // Moto(); // Chay motor
         motor_status = 1;
@@ -172,7 +180,9 @@ if(!checkFinger){
         return;
         }
        if((numberKeypad != setKeypadPassword) && (numberKeypad != 17)&&(numberKeypad != 18)){
-        Serial.println("failue"); 
+        // 17: phim A - Setting button
+        // 18: phim B - Back button
+        Serial.println("failue");
         checkX();
         tft.drawString("FAILED",110,180,1);
         timeDelay(1000);
@@ -193,11 +203,11 @@ if(!checkFinger){
                   bool verifyPass = false;
                   numberKeypad = 0;
                   loginSettingScreen();
-                  
+
                   while(!verifyPass){
                     Serial.println("Verify Pass");
                     checkNum(40,148,245,30,ackKeypad,8,0);
-                                        
+
                     if(!ackKeypad){
                       if( millis() - timerVoid > 10000 ){
                         Serial.println("exit verify");
@@ -208,11 +218,11 @@ if(!checkFinger){
                         return;
                          }
                     }
-                    
+
                       while(numberKeypad){
                         timerVoid = millis();
                         Serial.println("Read number");
-                        
+
                           if(numberKeypad == 18){
                               Serial.println("exit verify readnumber");
                               verifyPass = true;
@@ -239,14 +249,14 @@ if(!checkFinger){
                               Serial.println("login");
                               adminScreen();
                               }
-                        }     
+                        }
                   }
-                  
+
                   while(verifyPass){
                     int verify = 0;
                     while(!verify){
                       checkNum(140,101,245,30,ackKeypad,1,1);
-                      
+
                       if(!ackKeypad){
                         if( millis() - timerVoid > 20000 ){
                           Serial.println("exit admin mode");
@@ -261,35 +271,35 @@ if(!checkFinger){
                         verify = 1;
                       }
                     }
-                     
+
                   chooseMode = numberKeypad;
-                  
+
                   Serial.println("chooseMode");
                   Serial.print(chooseMode);
-                                    
+
                    if(chooseMode <= 0 || (chooseMode >= 4 && chooseMode <= 16) ||chooseMode >= 19){
                             Serial.print (chooseMode);
                             checkX();
                             tft.drawString(" Please choose number ",40,160,1);
                             tft.drawString("from 1 to 4",95,185,1);
                             Serial.println(" Please choose number from 1 to 4");
-                            timeDelay(2000);                            
+                            timeDelay(2000);
                             adminScreen();
                             numberKeypad = 0;
                         }
-                 else if(chooseMode == 17){                         
+                 else if(chooseMode == 17){
                             adminScreen();
-                            numberKeypad = 0;                              
+                            numberKeypad = 0;
                  }
                  else if(chooseMode == 18) {
                       Serial.println("Exit Admin Setting");
-                      return;            
+                      return;
                       }
-                      
+
                  else{
-//***************************** CHANGE PASSWORD************************************************//  
+//***************************** CHANGE PASSWORD************************************************//
                       if(chooseMode == 1){
-                        
+
                           Serial.println("Change Password Screen");
                           Serial.println(setKeypadPassword);
                           while(!exitMode){
@@ -297,7 +307,7 @@ if(!checkFinger){
                               timerVoid = millis();
                               numberKeypad = 0;
                               Serial.println("Please insert old setKeypadPassword:");
-                              
+
                               while(!numberKeypad){
                                   checkNum(40,108,245,30,ackKeypad,8,1);
                                   if(!ackKeypad){
@@ -310,18 +320,18 @@ if(!checkFinger){
                                         }
                                   }
                               }
-                              
+
                               checkChangePassword = numberKeypad;
                               Serial.println(checkChangePassword);
-                              
+
                               Serial.println("compare checkChangePassword");
-                              
+
                               if(checkChangePassword == 18) {
                                   Serial.println("Exit setting change password");
                                   numberKeypad = 0;
                                   exitMode = true;
                                   verifyPass= true;
-                                  adminScreen();  
+                                  adminScreen();
                               break;
                               }
                               else if(checkChangePassword == 17) {
@@ -338,12 +348,12 @@ if(!checkFinger){
                                 tft.drawString("New Password:",10,158,1);
                                 tft.fillRect(40,185,245,40,TFT_LIGHTGREY);
                                 tft.drawRect(39,184,247,42,TFT_BLACK);
-                              while(!exitMode){                          
+                              while(!exitMode){
                                   timerVoid = millis();
                                   numberKeypad = 0;
                                   Serial.println("Insert setNewKeypadPassword:");
-                                  
-                                  while(!numberKeypad){  
+
+                                  while(!numberKeypad){
                                     checkNum(40,185,245,30,ackKeypad,8,1);
                                     if(!ackKeypad){
                                         if( millis() - timerVoid > 20000 ){
@@ -354,15 +364,15 @@ if(!checkFinger){
                                         return;
                                         }
                                     }
-                                  if(numberKeypad == 17){                         
-                                  numberKeypad = 0;                              
+                                  if(numberKeypad == 17){
+                                  numberKeypad = 0;
                                   }
                                   else if(numberKeypad == 18) {
                                     Serial.println("Exit setting change password");
                                     //numberKeypad = 0;
                                     exitMode = true;
                                     verifyPass= true;
-                                    adminScreen();            
+                                    adminScreen();
                                              }
                                   }
                                   if(numberKeypad !=  18){
@@ -372,28 +382,28 @@ if(!checkFinger){
                                       checkV();
                                       tft.drawString("Change Password Successful!",10,180,1);
                                       timeDelay(1000);
-                                      numberKeypad = 0;      
-                                      exitMode = true; 
+                                      numberKeypad = 0;
+                                      exitMode = true;
                                       chooseMode=0;
                                       Serial.println(chooseMode);
                                       Serial.println(verifyPass);
                                   }
-                                     
+
                           }
                           }
                           exitMode = false;
                           }
                           }
                           exitMode = false;
-//******************************ADD FINGERPRINT ENROLL************************************************//                 
+//******************************ADD FINGERPRINT ENROLL************************************************//
                       if(chooseMode == 2){
                         Serial.println("Add Fingerprint Screen");
                         while(!exitMode){
                           addFingerScreen();
                           timerVoid = millis();
                           numberKeypad = 0;
-                          Serial.println("Please choose id from 1 to 230");  
-                          
+                          Serial.println("Please choose id from 1 to 230");
+
                           while(!numberKeypad){
                              checkNum(40,160,235,30,ackKeypad,8,1);
 
@@ -409,16 +419,16 @@ if(!checkFinger){
                                   }
                               }
                           }
-                          
-                          IDAddFinger = numberKeypad; 
+
+                          IDAddFinger = numberKeypad;
                           Serial.println(IDAddFinger);
-                          
+
                           if(IDAddFinger == 18) {
                           Serial.println("Exit setting change password");
                           numberKeypad = 0;
                           exitMode = true;
                           verifyPass= true;
-                          adminScreen();  
+                          adminScreen();
                           break;
                           }
                           else if(IDAddFinger == 17) {
@@ -432,22 +442,22 @@ if(!checkFinger){
                               exitMode = false;
                           }
                           else{
-                            Serial.println("Add Fingerprint Enroll as ID:");         
+                            Serial.println("Add Fingerprint Enroll as ID:");
                             //tft.drawFloat(IDAddFinger,0,140,170,1);
                             tft.setFreeFont(FSB12);
-                            Serial.println(IDAddFinger);  
+                            Serial.println(IDAddFinger);
                             tft.setFreeFont(FF12);
-                            timeDelay(1000);  
-                            getFingerprintEnroll();          
+                            timeDelay(1000);
+                            getFingerprintEnroll();
                             checkV();
                             tft.drawString("Add Fingerprint Successful!",15,180,1);
                             timeDelay(1000);
                             exitMode = false;
-                          }  
-                        }   
+                          }
+                        }
                  }
                  exitMode = false;
-//******************************DELETE FINGERPRINT ENROLL************************************************//                 
+//******************************DELETE FINGERPRINT ENROLL************************************************//
                  if(chooseMode == 3){
                   Serial.println("Delete Finger Screen");
                   while(!exitMode){
@@ -472,15 +482,15 @@ if(!checkFinger){
                                   }
                               }
                           }
-                          IDDeleteFinger = numberKeypad; 
+                          IDDeleteFinger = numberKeypad;
                           Serial.println(IDDeleteFinger);
-                          
+
                           if(IDDeleteFinger == 18) {
                           Serial.println("Exit setting change password");
                           numberKeypad = 0;
                           exitMode = true;
                           verifyPass= true;
-                          adminScreen();  
+                          adminScreen();
                           break;
                           }
                           else if(IDDeleteFinger == 17) {
@@ -494,11 +504,11 @@ if(!checkFinger){
                               exitMode = false;
                           }
                           else{
-                            Serial.println("Delete ID:");         
+                            Serial.println("Delete ID:");
                             tft.drawFloat(IDDeleteFinger,0,140,138,1);
-                            
+
                             tft.setFreeFont(FSB12);
-                            Serial.println(IDDeleteFinger);  
+                            Serial.println(IDDeleteFinger);
                             tft.setFreeFont(FF12);
                                    if(IDDeleteFinger == 0){
                                          drawScreen();
@@ -512,11 +522,11 @@ if(!checkFinger){
                                             tft.setFreeFont(FSB12);
                                             tft.drawString(".",rowdelall,190,1);
                                             rowdelall = rowdelall+25;
-                                            timeDelay(100);                   
+                                            timeDelay(100);
                                          }
                                     }
                                     else {
-                                        drawScreen();          
+                                        drawScreen();
                                         Serial.print("Deleting ID: ");
                                         Serial.println(IDDeleteFinger);
                                         deleteFingerprint(IDDeleteFinger);
@@ -530,20 +540,20 @@ if(!checkFinger){
                                             tft.setFreeFont(FSB12);
                                             tft.drawString(".",rowdel,190,1);
                                             rowdel = rowdel+25;
-                                            timeDelay(100);                   
+                                            timeDelay(100);
                                         }
                                         }
-                    
+
                                         checkV();
                                         tft.drawString("DELETED!",100,180,1);
                                         timeDelay(1500);
-                                        exitMode = false; 
-                            
-                 
+                                        exitMode = false;
+
+
                   }
-                  }                 
                   }
-                  exitMode = false;   
+                  }
+                  exitMode = false;
 }
 }
 }
@@ -552,7 +562,7 @@ if(!checkFinger){
 }
 void drawScreen(){
   tft.fillScreen(TFT_WHITE );
-  tft.fillRect(0,64,320,5,TFT_DARKGREY ); 
+  tft.fillRect(0,64,320,5,TFT_DARKGREY );
   tft.setSwapBytes(true);
   tft.pushImage(0,0,48,64,IconHUST);
   tft.pushImage(274,0,46,64,BBLAB);
@@ -634,7 +644,7 @@ void checkV(){
   tft.fillScreen(TFT_WHITE );
   tft.pushImage(110,50,100,100,iconcheckV);
   tft.setFreeFont(FSB12);
-  //timeDelay(1000);
+  timeDelay(1000);
   }
 void checkX(){
   tft.setSwapBytes(true);
@@ -652,15 +662,15 @@ uint8_t getFingerprintEnroll() {
   tft.fillScreen(TFT_WHITE);
   tft.drawString("Enrolling ID",10,10,1);
   Serial.print("Looking finger enroll as ID:"); Serial.println(IDAddFinger);
-  tft.drawString("Looking fingerenroll as ID: ",10,35,1); 
+  tft.drawString("Looking fingerenroll as ID: ",10,35,1);
   tft.drawFloat(IDAddFinger,0,285,35,1);
-  
+
   while (q != FINGERPRINT_OK) {
 q = finger.getImage();
     switch (q) {
     case FINGERPRINT_OK:{
       Serial.println("Image taken");
-      tft.drawString("Image taken",10,85,1); 
+      tft.drawString("Image taken",10,85,1);
       break;}
     case FINGERPRINT_NOFINGER:{
       Serial.print(".");
@@ -907,7 +917,7 @@ q = finger.image2Tz();
       Serial.println("Image too messy");
       return q;
     case FINGERPRINT_PACKETRECIEVEERR:
-      Serial.println("Communication error");     
+      Serial.println("Communication error");
       return q;
     case FINGERPRINT_FEATUREFAIL:
       Serial.println("Could not find fingerprint features");
@@ -918,7 +928,7 @@ q = finger.image2Tz();
     default:
       Serial.println("Unknown error");
       return q;
-  } 
+  }
   // OK converted!
 q = finger.fingerFastSearch();
   if (q == FINGERPRINT_OK) {
@@ -937,15 +947,15 @@ q = finger.fingerFastSearch();
   } else {
     Serial.println("Unknown error");
     return q;
-  }     
+  }
   // found a match!
-  Serial.print("Found ID: "); Serial.print(finger.fingerID); 
-  Serial.print(" with confidence of "); Serial.println(finger.confidence);  
+  Serial.print("Found ID: "); Serial.print(finger.fingerID);
+  Serial.print(" with confidence of "); Serial.println(finger.confidence);
   checkV();
   motor_status = 1; // Bat dau cho chay motor
   tft.drawString("Found ID :",80,180,1);
   tft.drawFloat(finger.fingerID,0,200,180,1);
-  timeDelay(500); 
+  timeDelay(500);
   drawScreen();
   homeScreen();
   return finger.fingerID;
@@ -987,42 +997,42 @@ int checkNum(uint16_t locationXRect, uint16_t locationYRect,uint16_t widthRect,u
 do {
      keyRead = i2cKeypad.getKey();
        switch(keyRead){
-          case '0': 
+          case '0':
             pressNumber = true;
             break;
-        case '1': 
+        case '1':
             pressNumber = true;
             break;
-        case '2': 
+        case '2':
             pressNumber = true;
             break;
-        case '3': 
+        case '3':
             pressNumber = true;
             break;
-        case '4': 
+        case '4':
             pressNumber = true;
             break;
-        case '5': 
+        case '5':
             pressNumber = true;
             break;
-        case '6': 
+        case '6':
             pressNumber = true;
             break;
-        case '7': 
+        case '7':
             pressNumber = true;
             break;
-        case '8': 
+        case '8':
             pressNumber = true;
             break;
-        case '9': 
+        case '9':
             pressNumber = true;
             break;
-        case 'A': 
+        case 'A':
             pressNumber = false;
             ackPress = 1;
             return numberKeypad = 17;
-            
-        case 'B': 
+
+        case 'B':
             pressNumber = false;
             return numberKeypad = 18;
         case 'C':
@@ -1031,15 +1041,15 @@ do {
             stringCharacter = "";
             numberCount = 0;
             pressNumber = false;
-            break;  
-        case 'D': 
+            break;
+        case 'D':
             numberKeypad = stringCharacter.toInt();
             Serial.print("Day so vua nhap la:");
-            Serial.println(stringCharacter);            
+            Serial.println(stringCharacter);
             stringCharacter="";
-            numberCount = 0; 
+            numberCount = 0;
             pressNumber = false;
-            return numberKeypad; 
+            return numberKeypad;
         case '*':
             pressNumber = false;
             break;
@@ -1051,8 +1061,8 @@ do {
        timerDelayVoid = millis();
         ackPress = 0;
        }
-       
-       if(millis()-timerDelayVoid > 10000){ 
+
+       if(millis()-timerDelayVoid > 10000){
                      tft.fillRect(locationXRect,locationYRect,widthRect,heightRect,TFT_LIGHTGREY);
                      locationXChar = locationXRect + 8;
                      stringCharacter = "";
@@ -1060,22 +1070,22 @@ do {
                      pressNumber = false;
                      //return numberKeypad = 0;
                   }
-      if (keyRead && (numberCount < digitNumber)){ 
-           
+      if (keyRead && (numberCount < digitNumber)){
+
            if(pressNumber){
                   timerDelay = millis();
-                  
+
                   stringCharacter = stringCharacter + keyRead;
-                  tft.drawChar(locationXChar,locationYRect+27,keyRead,TFT_BLACK,TFT_LIGHTGREY,1);  
-                     int i = 1;       
-                     while(i){        
+                  tft.drawChar(locationXChar,locationYRect+27,keyRead,TFT_BLACK,TFT_LIGHTGREY,1);
+                     int i = 1;
+                     while(i){
                       if(millis()-timerDelay > 100){
                         timerDelay = millis();
                         if(hideNumber == 0){
                           tft.fillRect(locationXChar,locationYRect,widthRect-220,heightRect,TFT_LIGHTGREY);
                           tft.drawChar(locationXChar-3,locationYRect+57,'*',TFT_DARKGREY,TFT_WHITE,3);
                         }
-                        locationXChar = locationXChar + 30; 
+                        locationXChar = locationXChar + 30;
                         numberCount++;
                         if(numberCount == 1){
                           ackPress = 1;
@@ -1084,7 +1094,7 @@ do {
                         i = 0;
                                }
                        }
-                }  
+                }
         }
-}while(numberCount);   
+}while(numberCount);
 }

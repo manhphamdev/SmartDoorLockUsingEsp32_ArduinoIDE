@@ -147,7 +147,6 @@ void setup() {
   monitor_status = 0;
 }
 bool exitMode = false;
-uint8_t chooseMode = 0;
 uint16_t id;
 uint16_t IDAddFinger;
 uint16_t IDDeleteFinger;
@@ -174,6 +173,7 @@ if(!checkFinger){                                     //checkFinger == true: co 
         checkV();
         // Moto(); // Chay motor
         motor_status = 1;
+        timeDelay(1000);
         drawScreen();
         homeScreen();
         numberKeypad = 0;
@@ -198,16 +198,18 @@ if(!checkFinger){                                     //checkFinger == true: co 
          return;
        }
        if(numberKeypad == 17){
-                unsigned long timerVoid = millis();
+                  unsigned long timerVoid = millis();
                   Serial.println("Log in Admin Setting");
-                  bool verifyPass = false;
+                  bool verifyPass = false;                      //verifyPass : true: vao che do setting thanh cong, false: nguoc lai
                   numberKeypad = 0;
                   loginSettingScreen();
-
+                  //*****************************************************************************//
+                  //CHECK PASS LOGIN SETTING MODE
+                  //*****************************************************************************//
                   while(!verifyPass){
                     Serial.println("Verify Pass");
                     checkNum(40,148,245,30,ackKeypad,8,0);
-
+                  //Sau 10s khong nhap vao ban phim, auto thoat ve homescreen
                     if(!ackKeypad){
                       if( millis() - timerVoid > 10000 ){
                         Serial.println("exit verify");
@@ -218,11 +220,9 @@ if(!checkFinger){                                     //checkFinger == true: co 
                         return;
                          }
                     }
-
                       while(numberKeypad){
                         timerVoid = millis();
-                        Serial.println("Read number");
-
+                        Serial.println("Check number");
                           if(numberKeypad == 18){
                               Serial.println("exit verify readnumber");
                               verifyPass = true;
@@ -231,7 +231,7 @@ if(!checkFinger){                                     //checkFinger == true: co 
                               homeScreen();
                               return;
                               }
-                          if(numberKeypad == 17){
+                          else if(numberKeypad == 17){
                               numberKeypad = 0;
                               loginSettingScreen();
                               }
@@ -246,17 +246,18 @@ if(!checkFinger){                                     //checkFinger == true: co 
                               timerVoid = millis();
                               verifyPass = true;
                               numberKeypad = 0;
-                              Serial.println("login");
+                              Serial.println("successfully logged in mode");
                               adminScreen();
                               }
                         }
                   }
-
+                  //*****************************************************************************//
+                  //                               SETTING MODE
+                  //*****************************************************************************//
                   while(verifyPass){
-                    int verify = 0;
-                    while(!verify){
+                    while(!numberKeypad){
                       checkNum(140,101,245,30,ackKeypad,1,1);
-
+                      //sau 20s khong nhap gi vao ban phim, auto thoat SETTING MODE
                       if(!ackKeypad){
                         if( millis() - timerVoid > 20000 ){
                           Serial.println("exit admin mode");
@@ -267,17 +268,12 @@ if(!checkFinger){                                     //checkFinger == true: co 
                           return;
                           }
                       }
-                      if(ackKeypad){
-                        verify = 1;
-                      }
                     }
-
-                  chooseMode = numberKeypad;
-
-                  Serial.println("chooseMode");
-                  Serial.print(chooseMode);
-
-                   if(chooseMode <= 0 || (chooseMode >= 4 && chooseMode <= 16) ||chooseMode >= 19){
+                    uint8_t chooseMode = 0;
+                    chooseMode = numberKeypad;
+                    Serial.println("chooseMode");
+                    Serial.print(chooseMode);
+                    if(chooseMode <= 0 || (chooseMode >= 4 && chooseMode <= 16) ||chooseMode >= 19){
                             Serial.print (chooseMode);
                             checkX();
                             tft.drawString(" Please choose number ",40,160,1);
@@ -287,12 +283,14 @@ if(!checkFinger){                                     //checkFinger == true: co 
                             adminScreen();
                             numberKeypad = 0;
                         }
-                 else if(chooseMode == 17){
+                    else if(chooseMode == 17){
                             adminScreen();
                             numberKeypad = 0;
-                 }
-                 else if(chooseMode == 18) {
+                    }
+                    else if(chooseMode == 18) {
                       Serial.println("Exit Admin Setting");
+                      drawScreen();
+                      homeScreen();
                       return;
                       }
 
@@ -307,7 +305,6 @@ if(!checkFinger){                                     //checkFinger == true: co 
                               timerVoid = millis();
                               numberKeypad = 0;
                               Serial.println("Please insert old setKeypadPassword:");
-
                               while(!numberKeypad){
                                   checkNum(40,108,245,30,ackKeypad,8,1);
                                   if(!ackKeypad){
@@ -644,7 +641,7 @@ void checkV(){
   tft.fillScreen(TFT_WHITE );
   tft.pushImage(110,50,100,100,iconcheckV);
   tft.setFreeFont(FSB12);
-  timeDelay(1000);
+  //timeDelay(1000);
   }
 void checkX(){
   tft.setSwapBytes(true);

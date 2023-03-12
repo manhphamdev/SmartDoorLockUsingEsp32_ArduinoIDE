@@ -21,7 +21,7 @@ The components used in the project include:
 + AS608 fingerprint module
 + Esp32 microcontroller and esp32-camera
 # 2. Hardware Connection Diagram
-<img src="https://user-images.githubusercontent.com/95463241/210167944-556747a4-3212-403e-9d20-c8d30c6a2cc2.png" width = "750">
+<img src="[https://user-images.githubusercontent.com/95463241/210167944-556747a4-3212-403e-9d20-c8d30c6a2cc2.png](https://user-images.githubusercontent.com/95463241/224550627-5d4f6c99-bf58-4217-998b-67e067d5fceb.png)" width = "750">
 
 # 3. Note
 You need to edit the TFT library so don't forget to read file README.md 

@@ -93,13 +93,12 @@ void timeDelay(int timer){
 
 void setup() {
   Serial.begin(9600);
-//  pinMode(switch_journey, INPUT_PULLUP);
-//  pinMode(button_CloseDoor, INPUT_PULLUP);
+
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
 
   if(setKeypadPassword == 0){
-  Serial.println("setKeypadPassword:");
+  Serial.println("Init Password Default:");
   Serial.println(setKeypadPassword);
   setKeypadPassword = KeypadPasswordDefault;
   Serial.println(setKeypadPassword);

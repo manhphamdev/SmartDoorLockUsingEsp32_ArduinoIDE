@@ -9,7 +9,7 @@ int savePassword(int password){
   uint8_t saveDigit_56 = 0;
   uint8_t saveDigit_78 = 0;
   if(password > MAX_PASSWORD){
-    return;
+    return 0;
   }
   saveDigit_12 = (password / 1000000);
   saveDigit_34 = ((password - saveDigit_12 * 1000000) / 10000);

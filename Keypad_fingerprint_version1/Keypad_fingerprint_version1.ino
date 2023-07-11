@@ -13,6 +13,7 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include "control_moto.h"
+#include "save_password.h"
 
 #define GFXFF 1
 #define Custom 1
@@ -96,13 +97,7 @@ void setup() {
 
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
-
-  if(setKeypadPassword == 0){
-  Serial.println("Init Password Default:");
-  Serial.println(setKeypadPassword);
-  setKeypadPassword = KeypadPasswordDefault;
-  Serial.println(setKeypadPassword);
-  }
+  
   while (!Serial);
   Wire.begin(21,22);                                         // Init I2C-Bus, GPIO4-Data, GPIO5 Clock
   Wire.beginTransmission(I2C_Addr);                        // Try to establish connection
@@ -118,6 +113,13 @@ void setup() {
   tft.setFreeFont(FF12);
   drawScreen();
   homeScreen();
+  if(setKeypadPassword == 0){
+  Serial.println("Init Password Default:");
+  Serial.println(setKeypadPassword);
+  setKeypadPassword = KeypadPasswordDefault;
+  Serial.println(setKeypadPassword);
+  }
+  setKeypadPassword = getPassword();
   Serial.println("\n\nAdafruit Fingerprint sensor enrollment");
   finger.begin(57600);
   if (finger.verifyPassword()) {
@@ -375,14 +377,16 @@ if(!checkFinger){                                     //checkFinger == true: co 
                                       setNewKeypadPassword = numberKeypad;
                                       setKeypadPassword = setNewKeypadPassword;
                                       Serial.println(setKeypadPassword);
-                                      checkV();
-                                      tft.drawString("Change Password Successful!",10,180,1);
-                                      timeDelay(1000);
-                                      numberKeypad = 0;
-                                      exitMode = true;
-                                      chooseMode=0;
-                                      Serial.println(chooseMode);
-                                      Serial.println(verifyPass);
+                                      if (savePassword(setKeypadPassword)){
+                                        checkV();
+                                        tft.drawString("Change Password Successful!",10,180,1);
+                                        timeDelay(1000);
+                                        numberKeypad = 0;
+                                        exitMode = true;
+                                        chooseMode=0;
+                                        Serial.println(chooseMode);
+                                        Serial.println(verifyPass);
+                                      }  
                                   }
 
                           }
@@ -556,6 +560,9 @@ if(!checkFinger){                                     //checkFinger == true: co 
 }
 }
 }
+//---------------------------------------------------------------------------------------
+//                                 TFT Screen
+//---------------------------------------------------------------------------------------
 void drawScreen(){
   tft.fillScreen(TFT_WHITE );
   tft.fillRect(0,64,320,5,TFT_DARKGREY );
@@ -604,13 +611,6 @@ tft.setFreeFont(FF12);
 tft.drawString("Old Password:",10,80,1);
 tft.fillRect(40,108,245,40,TFT_LIGHTGREY);
 tft.drawRect(39,107,247,42,TFT_BLACK);
-
-//tft.drawString("Old Password:",10,75,1);
-//tft.fillRect(40,100,245,40,TFT_LIGHTGREY);
-//tft.drawRect(39,99,247,42,TFT_BLACK);
-//tft.drawString("New Password:",10,150,1);
-//tft.fillRect(40,180,245,40,TFT_LIGHTGREY);
-//tft.drawRect(39,179,247,42,TFT_BLACK);
 }
 void addFingerScreen(){
 drawScreen();
